@@ -341,6 +341,10 @@ int strncasecmp(const char *s1, const char * s2, unsigned int sz);
 #define WOLFSSL_LOG_PRINTF
 #endif
 
+#ifdef MODULE_WOLFSSL_RPK
+#define HAVE_RPK
+#endif
+
 #ifdef __cplusplus
 }
 #endif
