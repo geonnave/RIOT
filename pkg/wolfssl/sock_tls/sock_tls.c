@@ -48,6 +48,36 @@ int sock_dtls_create(sock_tls_t *sock, const sock_udp_ep_t *local, const sock_ud
     return 0;
 }
 
+#ifdef MODULE_WOLFSSL_STATIC_MEMORY
+#define MAX_CONCURRENT_HANDSHAKES 1
+#define MAX_CONCURRENT_IO 1
+
+int sock_dtls_create_static(
+    sock_tls_t *sock, const sock_udp_ep_t *local, const sock_udp_ep_t *remote, uint16_t flags, WOLFSSL_METHOD* (*wolfSSL_method_func)(void* heap),
+    uint8_t *wolfssl_general_memory, size_t wolfssl_general_memory_sz, uint8_t *wolfssl_io_memory, size_t wolfssl_io_memory_sz)
+{
+    int ret;
+    if (!sock)
+        return -EINVAL;
+    XMEMSET(sock, 0, sizeof(sock_tls_t));
+    ret = wolfSSL_CTX_load_static_memory(&sock->ctx, wolfSSL_method_func, wolfssl_general_memory, wolfssl_general_memory_sz, 0, MAX_CONCURRENT_HANDSHAKES);
+    if (ret != SSL_SUCCESS)
+        return -ENOMEM;
+    ret = wolfSSL_CTX_load_static_memory(&sock->ctx, NULL, wolfssl_io_memory, wolfssl_io_memory_sz, WOLFMEM_IO_POOL_FIXED, MAX_CONCURRENT_IO);
+    if (ret != SSL_SUCCESS)
+        return -ENOMEM;
+
+    ret = sock_udp_create(&sock->conn.udp, local, remote, flags);
+    if (ret < 0) {
+        return ret;
+    }
+    if (remote) {
+        XMEMCPY(&sock->peer_addr, remote, sizeof(sock_udp_ep_t));
+    }
+    return 0;
+}
+#endif
+
 static int tls_session_create(sock_tls_t *sk)
 {
     if (!sk || !sk->ctx)

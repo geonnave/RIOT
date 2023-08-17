@@ -39,11 +39,19 @@ extern "C" {
 #define CUSTOM_RAND_GENERATE_BLOCK  cc310_random_generate
 #endif
 
+#ifdef MODULE_WOLFSSL_STATIC_MEMORY
+#undef NO_WOLFSSL_MEMORY
+#define USE_WOLFSSL_MEMORY
+#define WOLFSSL_STATIC_MEMORY
+/* Static memory requires fast math */
+#define WOLFSSL_FAST_MATH
+#else
 /* Single precision math */
 #define WOLFSSL_SP_MATH
 #define WOLFSSL_SP_SMALL
 #define SP_WORD_SIZE 32
 #define WOLFSSL_SP
+#endif
 
 /* GNRC support enabled if not
  * using sockets
@@ -194,9 +202,11 @@ int strncasecmp(const char *s1, const char * s2, unsigned int sz);
 #undef HAVE_ECC
 #ifdef MODULE_WOLFCRYPT_ECC
 #define HAVE_ECC
-#define FP_ECC
-#define WOLFSSL_HAVE_SP_ECC
-#define WOLFSSL_HAVE_SP_ECC
+#ifndef MODULE_WOLFSSL_STATIC_MEMORY
+    #define FP_ECC
+    #define WOLFSSL_HAVE_SP_ECC
+    #define WOLFSSL_HAVE_SP_ECC
+#endif
 #define ECC_TIMING_RESISTANT
 #define HAVE_SUPPORTED_CURVES
 #endif
@@ -251,8 +261,10 @@ int strncasecmp(const char *s1, const char * s2, unsigned int sz);
 #define RSA_LOW_MEM
 #define WC_RSA_BLINDING
 #define WOLFSSL_STATIC_RSA
-#define WOLFSSL_HAVE_SP_DH
-#define WOLFSSL_HAVE_SP_RSA
+#ifndef MODULE_WOLFSSL_STATIC_MEMORY
+    #define WOLFSSL_HAVE_SP_DH
+    #define WOLFSSL_HAVE_SP_RSA
+#endif
 #else
 #define NO_RSA
 #endif
@@ -343,6 +355,7 @@ int strncasecmp(const char *s1, const char * s2, unsigned int sz);
 
 #ifdef MODULE_WOLFSSL_RPK
 #define HAVE_RPK
+#define WOLFSSL_ASN_TEMPLATE
 #endif
 
 #ifdef __cplusplus

@@ -284,6 +284,12 @@ extern "C" {
  */
 int sock_dtls_create(sock_tls_t *sock, const sock_udp_ep_t *local, const sock_udp_ep_t *remote, uint16_t flags, WOLFSSL_METHOD *method);
 
+#ifdef MODULE_WOLFSSL_STATIC_MEMORY
+int sock_dtls_create_static(
+    sock_tls_t *sock, const sock_udp_ep_t *local, const sock_udp_ep_t *remote, uint16_t flags, WOLFSSL_METHOD* (*wolfSSL_method_func)(void* heap),
+    uint8_t *wolfssl_general_memory, size_t wolfssl_general_memory_sz, uint8_t *wolfssl_io_memory, size_t wolfssl_io_memory_sz);
+#endif
+
 /**
  * @brief   Sets the endpoint address for the remote DTLS peer associated to this sock object
  *

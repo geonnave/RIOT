@@ -42,4 +42,9 @@ ifneq (,$(filter wolfcrypt_cryptocell,$(USEMODULE)))
   SRC +=  tfm.c
 endif
 
+# Enabled only when static memory is selected
+ifneq (,$(filter wolfssl_static_memory,$(USEMODULE)))
+  SRC +=  memory.c
+endif
+
 include $(RIOTBASE)/Makefile.base
