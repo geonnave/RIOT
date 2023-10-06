@@ -45,6 +45,7 @@ extern "C" {
 #define WOLFSSL_STATIC_MEMORY
 /* Static memory requires fast math */
 #define WOLFSSL_FAST_MATH
+#define WOLFMEM_IO_SZ 1400 // equivalent to WOLFSSL_MAX_MTU
 #else
 /* Single precision math */
 #define WOLFSSL_SP_MATH
